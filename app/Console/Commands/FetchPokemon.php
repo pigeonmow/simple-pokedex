@@ -39,7 +39,7 @@ class FetchPokemon extends Command
     public function handle()
     {
         $data = $this->getData('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
-        
+
         if ($data['results']) {
             $this->withProgressBar($data['results'], function ($result) {
                 Pokemon::updateOrCreate(
