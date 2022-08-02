@@ -15,7 +15,7 @@ class PokemonController extends BaseController
      */
     public function index(Request $request)
     {
-        $pokemon = Pokemon::all();
+        $pokemon = Pokemon::paginate(10);
 
         return $this->sendResponse(PokemonResource::collection($pokemon), 'Pokemon retrieved successfully.');
     }
