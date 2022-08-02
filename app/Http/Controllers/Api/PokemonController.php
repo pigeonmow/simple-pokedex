@@ -13,7 +13,7 @@ class PokemonController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         $pokemon = Pokemon::all();
 

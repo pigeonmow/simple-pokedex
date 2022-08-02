@@ -16,8 +16,10 @@ class PokemonResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'number' => $this->number,
             'name' => $this->name,
             'url' => $this->url,
+            'sprite_url' => $this->sprite_url,
         ];
     }
 }
