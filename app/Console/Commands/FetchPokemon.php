@@ -38,18 +38,28 @@ class FetchPokemon extends Command
      */
     public function handle()
     {
+        $this->info('Importing...');
+        $this->newLine();
+
         $data = $this->getData('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
 
-        if ($data['results']) {
-            $this->withProgressBar($data['results'], function ($result) {
+        if ($data) {
+            $this->withProgressBar($data, function ($datum) {
                 Pokemon::updateOrCreate(
-                    ['name' => $result['name']],
-                    ['name' => $result['name'], 'url' => $result['url']]
+                    ['name' => $datum['name']],
+                    [
+                        'number' => $datum['number'],
+                        'name' => $datum['name'],
+                        'url' => $datum['url'],
+                        'sprite_url' => $datum['sprite_url']
+                    ]
                 );
             });
 
+            $this->newLine();
             $this->info('The pokemon were imported!');
         } else {
+            $this->newLine();
             $this->info('No pokemon found.');
         }
 
@@ -69,6 +79,21 @@ class FetchPokemon extends Command
 
         $response = curl_exec($client);
 
-        return json_decode($response, true);
+        $data = json_decode($response, true);
+
+        $refinedData = [];
+        foreach ($data['results'] as $key => $value) {
+            $c = curl_init($value['url']);
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+
+            $res = curl_exec($c);
+            $itemData = json_decode($res);
+
+            $refinedData[$key] = $value;
+            $refinedData[$key]['number'] = $key + 1;
+            $refinedData[$key]['sprite_url'] = $itemData->sprites->back_default;
+        }
+
+        return $refinedData;
     }
 }
