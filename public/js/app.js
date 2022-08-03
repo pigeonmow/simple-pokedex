@@ -32899,10 +32899,11 @@ var render = function () {
                 _vm._v("Editing " + _vm._s(_vm.selectedItem.name)),
               ]),
               _vm._v(" "),
-              _c("label", {
-                staticClass: "form-label",
-                attrs: { for: "number" },
-              }),
+              _c(
+                "label",
+                { staticClass: "form-label", attrs: { for: "number" } },
+                [_vm._v("Number")]
+              ),
               _vm._v(" "),
               _c("input", {
                 directives: [
@@ -32932,10 +32933,11 @@ var render = function () {
                 },
               }),
               _vm._v(" "),
-              _c("label", {
-                staticClass: "form-label",
-                attrs: { for: "name" },
-              }),
+              _c(
+                "label",
+                { staticClass: "form-label", attrs: { for: "name" } },
+                [_vm._v("Name")]
+              ),
               _vm._v(" "),
               _c("input", {
                 directives: [
@@ -32959,10 +32961,11 @@ var render = function () {
                 },
               }),
               _vm._v(" "),
-              _c("label", {
-                staticClass: "form-label",
-                attrs: { for: "spriteUrl" },
-              }),
+              _c(
+                "label",
+                { staticClass: "form-label", attrs: { for: "spriteUrl" } },
+                [_vm._v("Sprite Url")]
+              ),
               _vm._v(" "),
               _c("input", {
                 directives: [

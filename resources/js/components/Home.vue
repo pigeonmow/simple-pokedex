@@ -58,13 +58,13 @@
                 <div class="card-body">
                     <h5 class="card-title">Editing {{ selectedItem.name }}</h5>
 
-                    <label for="number" class="form-label"></label>
+                    <label for="number" class="form-label">Number</label>
                     <input v-model="selectedItem.number" name="number" id="number" class="form-control" type="number" step="1" min="0">
 
-                    <label for="name" class="form-label"></label>
+                    <label for="name" class="form-label">Name</label>
                     <input v-model="selectedItem.name" name="name" id="name" class="form-control" type="text">
 
-                    <label for="spriteUrl" class="form-label"></label>
+                    <label for="spriteUrl" class="form-label">Sprite Url</label>
                     <input v-model="selectedItem.sprite_url" name="sprite_url" id="spriteUrl" class="form-control" type="text">
                 </div>
 
