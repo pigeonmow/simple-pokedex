@@ -12,6 +12,7 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Sprite</th>
+                                <th scope="col">Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -20,6 +21,9 @@
                                 <td>{{ item.name }}</td>
                                 <td>
                                     <img :src="item.sprite_url" :alt="item.name">
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger" @click="deleteItem(item.id)">Delete</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -48,6 +52,8 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
     data () {
         return {
@@ -59,7 +65,6 @@ export default {
 
     mounted () {
         // console.log('Component mounted.');
-
         this.getData('/pokemon');
     },
 
@@ -90,7 +95,6 @@ export default {
                     this.makePagination(response.data);
                 }).catch(error => {
                     console.log(error);
-                    // TODO - handle error
                 });
         },
 
@@ -104,6 +108,42 @@ export default {
                 next: data.links.next,
             };
         },
+
+        deleteItem (id) {
+            console.log(id);
+            let self = this;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete(`/pokemon/${id}`)
+                        .then(function (response) {
+                            self.getData('/pokemon');
+
+                            Swal.fire(
+                                'Deleted!',
+                                'Your pokemon has been deleted.',
+                                'success'
+                            );
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            Swal.fire(
+                                'Oops!',
+                                'Something went wrong, please try again.',
+                                'error'
+                            );
+                        });
+                }
+            });
+        }
     }
 }
 </script>

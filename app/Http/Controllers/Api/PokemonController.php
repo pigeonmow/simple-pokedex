@@ -81,10 +81,16 @@ class PokemonController extends BaseController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        //
+        $pokemon = Pokemon::find($id);
+
+        if ($pokemon && $pokemon->delete()) {
+            return $this->sendResponse([], 'Pokemon deleted.');
+        }
+
+        return $this->sendError('Error attempting to delete pokemon.', [], 500);
     }
 }
