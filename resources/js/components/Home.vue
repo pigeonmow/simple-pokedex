@@ -24,6 +24,22 @@
                             </tr>
                             </tbody>
                         </table>
+
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item" :class="{'disabled' : pagination.current_page === 1}">
+                                    <button class="page-link" @click="getData(pagination.prev)">Previous</button>
+                                </li>
+                                <li v-for="page in pageNumbers" class="page-item" :class="{'active': pagination.current_page === page}">
+                                    <button class="page-link" @click="getData(`https://www.simple-pokedex.test/pokemon?page=${page}`)">{{ page }}</button>
+                                </li>
+                                <li class="page-item" :class="{'disabled' : pagination.current_page === pagination.last_page}">
+                                    <button class="page-link" @click="getData(pagination.next)">Next</button>
+                                </li>
+                                <li class="page-item"></li>
+                            </ul>
+                            <em>Page {{ pagination.current_page }} of {{ pagination.last_page }}</em>
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -32,30 +48,62 @@
 </template>
 
 <script>
-    export default {
-        data () {
-            return {
-                pokemon: []
-            }
-        },
-
-        mounted () {
-            console.log('Component mounted.');
-
-            this.getData('/pokemon');
-        },
-
-        methods: {
-            getData (url) {
-                axios.get(url)
-                    .then(response => {
-                        // console.log(response.data.data);
-                        this.pokemon = response.data.data;
-                    }).catch(error => {
-                        console.log(error);
-                        // TODO - handle error
-                    });
-            },
+export default {
+    data () {
+        return {
+            pokemon: [],
+            pagination: {},
+            pageOffset: 4,
         }
+    },
+
+    mounted () {
+        // console.log('Component mounted.');
+
+        this.getData('/pokemon');
+    },
+
+    computed: {
+        pageNumbers () {
+            let from = this.pagination.current_page - this.pageOffset;
+            if (from < 1) {
+                from = 1;
+            }
+            let to = from + (this.pageOffset * 2);
+            if (to >= this.pagination.last_page) {
+                to = this.pagination.last_page;
+            }
+            let pages = [];
+            for (let page = from; page <= to; page++) {
+                pages.push(page);
+            }
+            return pages;
+        }
+    },
+
+    methods: {
+        getData (url) {
+            axios.get(url)
+                .then(response => {
+                    // console.log(response.data.data);
+                    this.pokemon = response.data.data;
+                    this.makePagination(response.data);
+                }).catch(error => {
+                    console.log(error);
+                    // TODO - handle error
+                });
+        },
+
+        makePagination (data) {
+            this.pagination = {
+                current_page: data.meta.current_page,
+                last_page: data.meta.last_page,
+                first: data.links.first,
+                last: data.links.last,
+                prev: data.links.prev,
+                next: data.links.next,
+            };
+        },
     }
+}
 </script>

@@ -5299,15 +5299,56 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      pokemon: []
+      pokemon: [],
+      pagination: {},
+      pageOffset: 4
     };
   },
   mounted: function mounted() {
-    console.log('Component mounted.');
+    // console.log('Component mounted.');
     this.getData('/pokemon');
+  },
+  computed: {
+    pageNumbers: function pageNumbers() {
+      var from = this.pagination.current_page - this.pageOffset;
+
+      if (from < 1) {
+        from = 1;
+      }
+
+      var to = from + this.pageOffset * 2;
+
+      if (to >= this.pagination.last_page) {
+        to = this.pagination.last_page;
+      }
+
+      var pages = [];
+
+      for (var page = from; page <= to; page++) {
+        pages.push(page);
+      }
+
+      return pages;
+    }
   },
   methods: {
     getData: function getData(url) {
@@ -5316,9 +5357,21 @@ __webpack_require__.r(__webpack_exports__);
       axios.get(url).then(function (response) {
         // console.log(response.data.data);
         _this.pokemon = response.data.data;
+
+        _this.makePagination(response.data);
       })["catch"](function (error) {
         console.log(error); // TODO - handle error
       });
+    },
+    makePagination: function makePagination(data) {
+      this.pagination = {
+        current_page: data.meta.current_page,
+        last_page: data.meta.last_page,
+        first: data.links.first,
+        last: data.links.last,
+        prev: data.links.prev,
+        next: data.links.next
+      };
     }
   }
 });
@@ -28166,6 +28219,101 @@ var render = function () {
                 }),
                 0
               ),
+            ]),
+            _vm._v(" "),
+            _c("nav", [
+              _c(
+                "ul",
+                { staticClass: "pagination" },
+                [
+                  _c(
+                    "li",
+                    {
+                      staticClass: "page-item",
+                      class: { disabled: _vm.pagination.current_page === 1 },
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "page-link",
+                          on: {
+                            click: function ($event) {
+                              return _vm.getData(_vm.pagination.prev)
+                            },
+                          },
+                        },
+                        [_vm._v("Previous")]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _vm._l(_vm.pageNumbers, function (page) {
+                    return _c(
+                      "li",
+                      {
+                        staticClass: "page-item",
+                        class: { active: _vm.pagination.current_page === page },
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "page-link",
+                            on: {
+                              click: function ($event) {
+                                return _vm.getData(
+                                  "https://www.simple-pokedex.test/pokemon?page=" +
+                                    page
+                                )
+                              },
+                            },
+                          },
+                          [_vm._v(_vm._s(page))]
+                        ),
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "li",
+                    {
+                      staticClass: "page-item",
+                      class: {
+                        disabled:
+                          _vm.pagination.current_page ===
+                          _vm.pagination.last_page,
+                      },
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "page-link",
+                          on: {
+                            click: function ($event) {
+                              return _vm.getData(_vm.pagination.next)
+                            },
+                          },
+                        },
+                        [_vm._v("Next")]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("li", { staticClass: "page-item" }),
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c("em", [
+                _vm._v(
+                  "Page " +
+                    _vm._s(_vm.pagination.current_page) +
+                    " of " +
+                    _vm._s(_vm.pagination.last_page)
+                ),
+              ]),
             ]),
           ]),
         ]),

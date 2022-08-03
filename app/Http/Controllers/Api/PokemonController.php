@@ -17,7 +17,7 @@ class PokemonController extends BaseController
     {
         $pokemon = Pokemon::paginate(10);
 
-        return $this->sendResponse(PokemonResource::collection($pokemon), 'Pokemon retrieved successfully.');
+        return $this->sendResponse(PokemonResource::collection($pokemon), 'Pokemon retrieved successfully.', true);
     }
 
     /**
