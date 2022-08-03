@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\PokemonResource;
 use App\Models\Pokemon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PokemonController extends BaseController
 {
@@ -70,11 +71,28 @@ class PokemonController extends BaseController
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        $pokemon = Pokemon::find($id);
+
+        if ($pokemon) {
+            try {
+                $pokemon->update([
+                    'number' => $request->number,
+                    'name' => $request->name,
+                    'sprite_url' => $request->sprite_url,
+                ]);
+
+                return $this->sendResponse([], 'Pokemon updated.');
+            } catch (\Exception $exception) {
+                Log::info($exception->getMessage());
+                return $this->sendError('Error attempting to update pokemon.', [], 500);
+            }
+        }
+
+        return $this->sendError('Pokemon not found.');
     }
 
     /**

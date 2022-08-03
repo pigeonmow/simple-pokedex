@@ -23,6 +23,7 @@
                                     <img :src="item.sprite_url" :alt="item.name">
                                 </td>
                                 <td>
+                                    <button class="btn btn-primary" @click="editItem(item)">Edit</button>
                                     <button class="btn btn-danger" @click="deleteItem(item.id)">Delete</button>
                                 </td>
                             </tr>
@@ -48,6 +49,31 @@
                 </div>
             </div>
         </div>
+
+        <div v-if="showEditModal" class="edit-modal">
+            <div class="card">
+                <div class="card-header">
+                    Edit Pokemon
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Editing {{ selectedItem.name }}</h5>
+
+                    <label for="number" class="form-label"></label>
+                    <input v-model="selectedItem.number" name="number" id="number" class="form-control" type="number" step="1" min="0">
+
+                    <label for="name" class="form-label"></label>
+                    <input v-model="selectedItem.name" name="name" id="name" class="form-control" type="text">
+
+                    <label for="spriteUrl" class="form-label"></label>
+                    <input v-model="selectedItem.sprite_url" name="sprite_url" id="spriteUrl" class="form-control" type="text">
+                </div>
+
+                <div class="card-footer">
+                    <button class="btn btn-primary" @click="saveItem(selectedItem.id)">Save</button>
+                    <button class="btn btn-danger" @click="closeEditModal">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -60,15 +86,21 @@ export default {
             pokemon: [],
             pagination: {},
             pageOffset: 4,
+            showEditModal: false,
+            selectedItem: null,
         }
     },
 
     mounted () {
-        // console.log('Component mounted.');
         this.getData('/pokemon');
     },
 
     computed: {
+        /**
+         * Calculates the paginated data page numbers.
+         *
+         * @returns {*[]}
+         */
         pageNumbers () {
             let from = this.pagination.current_page - this.pageOffset;
             if (from < 1) {
@@ -87,10 +119,14 @@ export default {
     },
 
     methods: {
+        /**
+         * Gets the data from the API.
+         *
+         * @param url
+         */
         getData (url) {
             axios.get(url)
                 .then(response => {
-                    // console.log(response.data.data);
                     this.pokemon = response.data.data;
                     this.makePagination(response.data);
                 }).catch(error => {
@@ -98,6 +134,11 @@ export default {
                 });
         },
 
+        /**
+         * Creates the pagination object from response data.
+         *
+         * @param data
+         */
         makePagination (data) {
             this.pagination = {
                 current_page: data.meta.current_page,
@@ -109,8 +150,59 @@ export default {
             };
         },
 
+        /**
+         * Closes the modal.
+         */
+        closeEditModal () {
+            this.showEditModal = false;
+            this.selectedItem = null;
+        },
+
+        /**
+         * Opens the edit item modal.
+         *
+         * @param item
+         */
+        editItem (item) {
+            this.selectedItem = structuredClone(item);
+            this.showEditModal = true;
+        },
+
+        /**
+         * Submits ajax request to API put endpoint.
+         *
+         * @param id
+         */
+        saveItem (id) {
+            let self = this;
+
+            axios.put(`/pokemon/${id}`, this.selectedItem)
+                .then(function (response) {
+                    self.getData('/pokemon');
+                    self.showEditModal =false;
+
+                    Swal.fire(
+                        'Updated!',
+                        'Your pokemon has been updated.',
+                        'success'
+                    );
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    Swal.fire(
+                        'Oops!',
+                        'Something went wrong, please try again.',
+                        'error'
+                    );
+                });
+        },
+
+        /**
+         * Submits ajax request to API destroy endpoint.
+         *
+         * @param id
+         */
         deleteItem (id) {
-            console.log(id);
             let self = this;
 
             Swal.fire({
@@ -147,3 +239,21 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+</style>
